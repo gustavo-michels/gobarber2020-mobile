@@ -22,6 +22,12 @@ import {
   ProviderMetaText,
 } from './styles';
 
+interface ProviderProps {
+  id: string;
+  name: string;
+  avatar_url: string;
+}
+
 export interface Provider {
   id: string;
   name: string;
@@ -31,7 +37,7 @@ export interface Provider {
 const Dashboard: React.FC = () => {
   const [providers, setProviders] = useState<Provider[]>([]);
 
-  const { signOut, user } = useAuth();
+  const { user } = useAuth();
   const { navigate } = useNavigation();
 
   useEffect(() => {
@@ -41,13 +47,12 @@ const Dashboard: React.FC = () => {
   }, []);
 
   const navigateToProfile = useCallback(() => {
-    // navigate('Profile');
-    signOut();
-  }, [signOut]);
+    navigate('Profile');
+  }, [navigate]);
 
   const navigateToCreateAppointment = useCallback(
-    (providerId: string) => {
-      navigate('CreateAppointment', { providerId });
+    (provider: ProviderProps) => {
+      navigate('CreateAppointment', { provider });
     },
     [navigate],
   );
@@ -62,7 +67,11 @@ const Dashboard: React.FC = () => {
 
         <ProfileButton onPress={navigateToProfile}>
           <UserAvatar
-            source={{ uri: `https://api.adorable.io/avatars/120/${user.name}` }}
+            source={{
+              uri: user.avatar_url
+                ? user.avatar_url
+                : `https://api.adorable.io/avatars/56/${user.id}`,
+            }}
           />
         </ProfileButton>
       </Header>
@@ -75,11 +84,13 @@ const Dashboard: React.FC = () => {
         }
         renderItem={({ item: provider }) => (
           <ProviderContainer
-            onPress={() => navigateToCreateAppointment(provider.id)}
+            onPress={() => navigateToCreateAppointment(provider)}
           >
             <ProviderAvatar
               source={{
-                uri: `https://api.adorable.io/avatars/120/${provider.name}`,
+                uri: provider.avatar_url
+                  ? provider.avatar_url
+                  : `https://api.adorable.io/avatars/72/${provider.id}`,
               }}
             />
             <ProviderInfo>
